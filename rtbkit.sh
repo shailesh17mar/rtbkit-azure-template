@@ -4,7 +4,7 @@ echo 'RTBkit ubuntu installation script';
 echo 'This script will install all of the core dependencies of RTBkit and build it successfully';
 
 echo "Installing dependencies: git, ngnix, core, zookeeper...";
-sudo apt-get install linux-tools-generic libbz2-dev python-dev scons libtool liblzma-dev libblas-dev make automake ccache ant openjdk-7-jdk libcppunit-dev doxygen libcrypto++-dev libACE-dev gfortran liblapack-dev libevent-dev libssh2-1-dev libicu-dev libv8-dev g++ google-perftools libgoogle-perftools-dev zlib1g-dev git pkg-config valgrind autoconf libcurl4-openssl-dev cmake libsigc++-2.0-dev zookeeper zookeeperd redis-server graphite-carbon graphite-web nginx uwsgi uwsgi-plugin-python
+sudo apt-get -y install linux-tools-generic libbz2-dev python-dev scons libtool liblzma-dev libblas-dev make automake ccache ant openjdk-7-jdk libcppunit-dev doxygen libcrypto++-dev libACE-dev gfortran liblapack-dev libevent-dev libssh2-1-dev libicu-dev libv8-dev g++ google-perftools libgoogle-perftools-dev zlib1g-dev git pkg-config valgrind autoconf libcurl4-openssl-dev cmake libsigc++-2.0-dev zookeeper zookeeperd redis-server graphite-carbon graphite-web nginx uwsgi uwsgi-plugin-python
 
 sudo echo "CARBON_CACHE_ENABLED=true"  >> /etc/default/graphite-carbon
 
