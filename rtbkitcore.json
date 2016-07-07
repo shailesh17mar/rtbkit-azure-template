@@ -1,259 +1,275 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "0.0.0.1",
-  "parameters": {
-    "storageAccountType": {
-      "type": "string",
-      "defaultValue": "Standard_LRS",
-      "metadata": {
-        "description": "Storage Account type"
-      }
-    },
-    "vmName": {
-      "type": "string",
-      "metadata": {
-        "description": "VM name"
-      }
-    },
-    "vmSize": {
-      "type": "string",
-      "defaultValue": "Standard_A8",
-      "metadata": {
-        "description": "Size of the VM"
-      }
-    },
-    "imagePublisher": {
-      "type": "string",
-      "defaultValue": "Canonical",
-      "metadata": {
-        "description": "Image Publisher"
-      }
-    },
-    "imageOffer": {
-      "type": "string",
-      "defaultValue": "UbuntuServer",
-      "metadata": {
-        "description": "Image Offer"
-      }
-    },
-    "imageSKU": {
-      "type": "string",
-      "defaultValue": "14.04.2-LTS",
-      "metadata": {
-        "description": "Image SKU"
-      }
-    },
-    "adminUserName": {
-      "type": "string",
-      "metadata": {
-        "description": "Admin username"
-      }
-    },
-    "adminPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Admin password"
-      }
-    },
-    "nsgName": {
-      "type": "string",
-      "defaultValue": "rtbkitNsg",
-      "metadata": {
-        "description": "Network security group name"
-      }
-    }
-  },
-  "variables": {
-    "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'zk')]",
-    "availabilitySetName": "RTBKitAvSet",
-    "virtualNetworkName": "RTBKitVNET",
-    "vnetAddressPrefix": "0.0.0.0/0",
-    "publicIPAddressType": "Dynamic",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-    "subnet1Name": "Subnet-1",
-    "subnet1Prefix": "10.0.0.0/24",
-    "nicName": "RTBKitNIC",
-    "subnet1Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet1Name'))]",
-    "customScriptFilePath": "https://raw.githubusercontent.com/shailesh17mar/rtbkit-azure-template/master/rtbkit.sh",
-    "customScriptCommandToExecute": "sh rtbkit.sh",
-    "vmExtensionName": "RTBKitExtension"
-  },
-  "resources": [
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('storageAccountName')]",
-      "apiVersion": "2015-05-01-preview",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "accountType": "[parameters('storageAccountType')]"
-      }
-    },
-    {
-      "type": "Microsoft.Compute/availabilitySets",
-      "name": "[variables('availabilitySetName')]",
-      "apiVersion": "2015-05-01-preview",
-      "location": "[resourceGroup().location]",
-      "properties": { }
-    },
-    {
-          "apiVersion": "2015-06-15",
-          "type": "Microsoft.Network/networkSecurityGroups",
-          "name": "[parameters('nsgName')]",
-          "location": "[resourceGroup().location]",
-          "tags": {
-            "displayName": "NSG - Remote Access"
-          },
-          "properties": {
-            "securityRules": [
-              {
-                "name": "allow-port-22",
-                 "properties": {
-                  "description": "Allow Subnet",
-                  "protocol": "Tcp",
-                  "sourcePortRange": "22",
-                  "destinationPortRange": "22",
-                  "sourceAddressPrefix": "[variables('vnetAddressPrefix')]",
-                  "destinationAddressPrefix": "*",
-                  "access": "Allow",
-                  "priority": 100,
-                  "direction": "Inbound"
-                }
-              },
-              {
-                "name": "allow-port-4888",
-                "properties": {
-                  "description": "Allow Subnet",
-                  "protocol": "Tcp",
-                  "sourcePortRange": "4888",
-                  "destinationPortRange": "4888",
-                  "sourceAddressPrefix": "*",
-                  "destinationAddressPrefix": "*",
-                  "access": "Allow",
-                  "priority": 100,
-                  "direction": "Inbound"
-                }
-              },
-              {
-                "name": "allow-port-80",
-                 "properties": {
-                  "description": "Allow Subnet",
-                  "protocol": "Tcp",
-                  "sourcePortRange": "80",
-                  "destinationPortRange": "80",
-                  "sourceAddressPrefix": "[*",
-                  "destinationAddressPrefix": "*",
-                  "access": "Allow",
-                  "priority": 100,
-                  "direction": "Inbound"
-                }
-              }
-              
-            ]
-          }
-    },
-    {
-      "apiVersion": "2015-05-01-preview",
-      "type": "Microsoft.Network/virtualNetworks",
-      "name": "[variables('virtualNetworkName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-             "[concat('Microsoft.Network/networkSecurityGroups/', parameters('nsgName'))]"
-           ],  
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('vnetAddressPrefix')]"
-          ]
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "0.0.0.1",
+    "parameters": {
+        "storageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "metadata": {
+                "description": "Storage Account type"
+            }
+        },
+        "vmName": {
+            "type": "string",
+            "metadata": {
+                "description": "VM name"
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_A8",
+            "metadata": {
+                "description": "Size of the VM"
+            }
+        },
+        "imagePublisher": {
+            "type": "string",
+            "defaultValue": "Canonical",
+            "metadata": {
+                "description": "Image Publisher"
+            }
+        },
+        "imageOffer": {
+            "type": "string",
+            "defaultValue": "UbuntuServer",
+            "metadata": {
+                "description": "Image Offer"
+            }
+        },
+        "imageSKU": {
+            "type": "string",
+            "defaultValue": "14.04.2-LTS",
+            "metadata": {
+                "description": "Image SKU"
+            }
+        },
+        "adminUserName": {
+            "type": "string",
+            "metadata": {
+                "description": "Admin username"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Admin password"
+            }
+        },
+        "nsgName": {
+            "type": "string",
+            "defaultValue": "rtbkitNsg",
+            "metadata": {
+                "description": "Network security group name"
+            }
         }
-      }
     },
-    {
-      "apiVersion": "2015-05-01-preview",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('nicName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
+    "variables": {
+        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'zk')]",
+        "availabilitySetName": "RTBKitAvSet",
+        "virtualNetworkName": "RTBKitVNET",
+        "scenarioPrefix": "customscriptLinux",
+        "vnetAddressPrefix": "10.0.0.0/16",
+        "publicIPAddressType": "Dynamic",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+        "subnet1Name": "Subnet-1",
+        "subnet1Prefix": "10.0.0.0/24",
+        "nicName": "RTBKitNIC",
+        "subnet1Ref": "[concat(variables('vnetID'),'/subnets/', variables('subnet1Name'))]",
+        "customScriptFilePath": "https://raw.githubusercontent.com/shailesh17mar/rtbkit-azure-template/master/rtbkit.sh",
+        "customScriptCommandToExecute": "sh rtbkit.sh",
+        "vmExtensionName": "RTBEx",
+        "subnetName": "[concat(variables('scenarioPrefix'),'Subnet')]",
+        "subnetPrefix": "10.0.0.0/24",
+        "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
+
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2015-05-01-preview",
+            "location": "[resourceGroup().location]",
             "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[concat('10.0.0.', copyIndex(4))]"
+                "accountType": "[parameters('storageAccountType')]"
             }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "2015-05-01-preview",
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
-        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
-      ],
-      "properties": {
-        "availabilitySet": {
-          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
         },
-        "hardwareProfile": {
-          "vmSize": "[parameters('vmSize')]"
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[variables('availabilitySetName')]",
+            "apiVersion": "2015-05-01-preview",
+            "location": "[resourceGroup().location]",
+            "properties": { }
         },
-        "osProfile": {
-          "computername": "[parameters('vmName')]",
-          "adminUsername": "[parameters('adminUserName')]",
-          "adminPassword": "[parameters('adminPassword')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[parameters('imagePublisher')]",
-            "offer": "[parameters('imageOffer')]",
-            "sku": "[parameters('imageSKU')]",
-            "version": "latest"
-          },
-          "osDisk": {
-            "name": "osdisk",
-            "vhd": {
-              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, 'vhds/', 'osdisk', copyIndex(), '.vhd')]"
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[parameters('nsgName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "NSG - Remote Access"
             },
-            "caching": "ReadWrite",
-            "createOption": "FromImage"
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow-port-22",
+                        "properties": {
+                            "description": "Allow Subnet",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "22",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "[variables('vnetAddressPrefix')]",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "allow-port-4888",
+                        "properties": {
+                            "description": "Allow Subnet",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "4888",
+                            "destinationPortRange": "4888",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 110,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "allow-port-80",
+                        "properties": {
+                            "description": "Allow Subnet",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "80",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 120,
+                            "direction": "Inbound"
+                        }
+                    }
+
+                ]
             }
-          ]
+        },
+        {
+            "apiVersion": "2015-05-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('nsgName'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('vnetAddressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                      
+                ]
+            }
+        },
+        {
+            "apiVersion": "2015-05-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('vmName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('adminUserName')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[parameters('imagePublisher')]",
+                        "offer": "[parameters('imageOffer')]",
+                        "sku": "[parameters('imageSKU')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "osdisk",
+                        "vhd": {
+                            "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, 'vhds/', 'osdisk',  '.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('vmName'),'/', variables('vmExtensionName'))]",
+            "apiVersion": "2015-05-01-preview",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.5",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[variables('customScriptFilePath')]"
+                    ],
+                    "commandToExecute": "[variables('customScriptCommandToExecute')]"
+                }
+            }
         }
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[variables('vmExtensionName')]",
-      "apiVersion": "0.0.0.1",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.OSTCExtensions",
-        "type": "CustomScriptForLinux",
-        "typeHandlerVersion": "1.5",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "fileUris": [
-            "[variables('customScriptFilePath')]"
-          ],
-          "commandToExecute": "[variables('customScriptCommandToExecute')]"
-        }
-      }
-    }
-  ]
+    ]
 }
