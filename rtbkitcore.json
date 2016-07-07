@@ -57,7 +57,7 @@
     },
     "nsgName": {
       "type": "string",
-      "defaultValue": "rtbkitNsg"
+      "defaultValue": "rtbkitNsg",
       "metadata": {
         "description": "Network security group name"
       }
@@ -170,12 +170,8 @@
     {
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(variables('nicName'), copyIndex())]",
+      "name": "[variables('nicName')]",
       "location": "[resourceGroup().location]",
-      "copy": {
-        "name": "foo",
-        "count": "[parameters('scaleNumber')]"
-      },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
       ],
@@ -194,15 +190,11 @@
     {
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat(parameters('vmName'), copyIndex())]",
+      "name": "[parameters('vmName')]",
       "location": "[resourceGroup().location]",
-      "copy": {
-        "name": "foo",
-        "count": "[parameters('scaleNumber')]"
-      },
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyIndex())]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
         "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
       ],
       "properties": {
@@ -213,7 +205,7 @@
           "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
-          "computername": "[concat(parameters('vmName'), copyIndex())]",
+          "computername": "[parameters('vmName')]",
           "adminUsername": "[parameters('adminUserName')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -236,7 +228,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'), copyIndex()))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
             }
           ]
         }
@@ -244,11 +236,11 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "rtbkitExt",
+      "name": "[variables('vmExtensionName')]",
       "apiVersion": "0.0.0.1",
-      "location": "<location>",
+      "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', <parameter></parameter>s('vmName'))]"
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
       ],
       "properties": {
         "publisher": "Microsoft.OSTCExtensions",
@@ -257,9 +249,9 @@
         "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "variables('customScriptFilePath')"
+            "[variables('customScriptFilePath')]"
           ],
-          "commandToExecute": "variables('customScriptCommandToExecute')"
+          "commandToExecute": "[variables('customScriptCommandToExecute')]"
         }
       }
     }
