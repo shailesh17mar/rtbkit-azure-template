@@ -4,6 +4,8 @@ echo 'Clean existing locks'
 sudo rm /var/lib/apt/lists/lock
 sudo rm /var/cache/apt/archives/lock
 
+sudo apt-get update
+
 echo 'RTBkit ubuntu installation script';
 echo 'This script will install all of the core dependencies of RTBkit and build it successfully';
 
